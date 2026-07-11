@@ -1,0 +1,7 @@
+model.gguf
+__pycache__/
+*.pyc
+input/
+output/
+practice_output.json
+venv/
