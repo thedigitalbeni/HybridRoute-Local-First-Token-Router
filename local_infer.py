@@ -25,7 +25,13 @@ class LocalModel:
     def __init__(self):
         self.llm = Llama(
             model_path=MODEL_PATH,
-            n_ctx=2048,
+            # Reduced from 2048: every real system+user prompt tested stays
+            # well under 300 tokens combined. Smaller context allocation
+            # speeds up llama.cpp's setup per call, which matters when total
+            # wall-clock time across ~19 tasks is the constraint, not just
+            # correctness. If you add categories with longer real prompts,
+            # raise this back up.
+            n_ctx=1024,
             n_threads=2,  # matches the 2 vCPU grading environment
             n_gpu_layers=0,  # CPU-only -- don't assume GPU access in the grading container
             verbose=False,
@@ -42,7 +48,13 @@ class LocalModel:
                 {"role": "system", "content": system},
                 {"role": "user", "content": prompt},
             ],
-            max_tokens=256,
-            temperature=0.2,
+            # Reduced from 256: every real verified-correct local answer
+            # (sentiment, summary, NER) landed well under 100 tokens. 150
+            # keeps real safety margin while capping worst-case CPU
+            # generation time -- directly targets the most likely cause of
+            # MISSING_TASKS (a slow/contended grading CPU running out the
+            # 10-minute budget before all 19 tasks finish).
+            max_tokens=150,
+            temperature=0.0,
         )
         return resp["choices"][0]["message"]["content"].strip()

@@ -1,0 +1,21 @@
+[
+  {"task_id": "scale-01", "prompt": "What is the capital of Canada, and what river runs through it?"},
+  {"task_id": "scale-02", "prompt": "Who wrote the theory of relativity, and in what year was the general theory published?"},
+  {"task_id": "scale-03", "prompt": "What is the tallest mountain in Africa, and which country is it located in?"},
+  {"task_id": "scale-04", "prompt": "A warehouse has 480 boxes. It ships 25% of them on Monday and 90 more on Wednesday. How many boxes remain?"},
+  {"task_id": "scale-05", "prompt": "A car travels 60 miles in the first hour and 45 miles in the second hour. What is its average speed over the two hours?"},
+  {"task_id": "scale-06", "prompt": "Classify the sentiment of this review: The interface is intuitive and fast, but customer support took days to respond."},
+  {"task_id": "scale-07", "prompt": "Classify the sentiment of this review: Absolutely loved the food and the service was fantastic from start to finish."},
+  {"task_id": "scale-08", "prompt": "Summarize the following in exactly one sentence: Solar panels convert sunlight directly into electricity using photovoltaic cells made of semiconductor materials like silicon. When sunlight hits these cells, it excites electrons, creating an electric current. Modern residential systems can offset a significant portion of a household's electricity usage, though efficiency varies with panel angle, shading, and local climate."},
+  {"task_id": "scale-09", "prompt": "Summarize the following in exactly one sentence: Coral reefs, though covering less than one percent of the ocean floor, support roughly a quarter of all marine species. Rising ocean temperatures and acidification caused by climate change have led to widespread coral bleaching events, threatening these ecosystems and the coastal communities that depend on them for fishing and tourism."},
+  {"task_id": "scale-10", "prompt": "Extract all named entities and their types from: Dr. Amara Okafor presented her research at Stanford University in California this past November."},
+  {"task_id": "scale-11", "prompt": "Extract all named entities and their types from: Netflix announced its new headquarters in Toronto, with CEO Ted Sarandos making the announcement on Tuesday."},
+  {"task_id": "scale-12", "prompt": "This function should return the average of a list but has a bug: def get_average(nums): return sum(nums) / len(nums) - 1. Find and fix it."},
+  {"task_id": "scale-13", "prompt": "This function should check if a string is a palindrome but has a bug: def is_palindrome(s): return s == s[::-1].lower(). Find and fix it."},
+  {"task_id": "scale-14", "prompt": "Four coworkers, Priya, Tom, Ana, and Leo, each work in a different department: sales, HR, IT, finance. Priya does not work in IT. Tom works in finance. Ana works in HR. Who works in IT?"},
+  {"task_id": "scale-15", "prompt": "Five houses in a row are painted different colors. The red house is immediately left of the blue house. The green house is at the far right. The blue house is in the middle. What color is the house at the far left?"},
+  {"task_id": "scale-16", "prompt": "Three runners, Alex, Beth, and Cara, finished a race in different positions: first, second, third. Alex did not finish first. Beth finished before Cara. Who finished first?"},
+  {"task_id": "scale-17", "prompt": "Write a Python function that returns the number of vowels in a given string, case-insensitive."},
+  {"task_id": "scale-18", "prompt": "Write a Python function that checks whether a given number is prime."},
+  {"task_id": "scale-19", "prompt": "Write a Python function that flattens a nested list of arbitrary depth into a single flat list."}
+]

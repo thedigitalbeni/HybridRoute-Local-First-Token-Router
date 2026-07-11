@@ -62,10 +62,19 @@ def classify_task(prompt: str) -> str:
     if re.search(r"\bsummar(y|ise|ize)\b|\bcondense\b|\bin (exactly )?one sentence\b", p):
         return CATEGORY_SUMMARY
 
-    # Logical / deductive reasoning: constraint puzzle language
+    # Logical / deductive reasoning: constraint puzzle language.
+    # Broadened after real testing showed the narrow version (tied to the
+    # single "who owns a pet" practice example's exact phrasing) completely
+    # missed other valid puzzle styles: "each work in a different department"
+    # (different verb than has/owns/likes), "who finished/works/lives" (not
+    # just "who owns"), and positional/spatial grid puzzles ("immediately
+    # left of", "in the middle") that don't use "each...different" at all.
     if re.search(
-        r"\beach own\b|\bwho owns\b|\bdoes not\b.*\bown\b|\bpuzzle\b|\bwhich (one|person)\b"
-        r"|\beach (has|owns|likes)\b.*\bdifferent\b",
+        r"\beach\b.*\bdifferent\b"
+        r"|\bwho (is|was|owns|works|worked|finished|lives|lived|plays|played|has)\b"
+        r"|\bdoes not\b.*\bown\b|\bpuzzle\b|\bwhich (one|person|color|position)\b"
+        r"|\bimmediately (left|right|before|after)\b|\bin the middle\b"
+        r"|\bfar (left|right)\b|\bnext to\b|\badjacent\b",
         p,
     ):
         return CATEGORY_LOGIC

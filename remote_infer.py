@@ -38,22 +38,30 @@ SYSTEM_PROMPTS = {
     ),
 }
 
-# Sized to what each answer actually needs, not a flat guess. IMPORTANT: real
-# pipeline testing showed math, code_gen, AND code_debug all hitting their
-# cap exactly in separate runs -- a hard signal this is a systemic model
-# behavior (both minimax-m3 and kimi-k2p7-code can spend tokens on internal
-# reasoning even when explicitly instructed not to), not a one-off. Every cap
-# below has real safety headroom, not the bare minimum. If a completion
-# token count lands exactly on the cap again in any future run (watch the
-# [WARN] lines this prints), that category needs even MORE headroom -- a
-# truncated answer failing accuracy costs the whole task, far worse than
-# extra tokens.
+# Sized from REAL observed data, not a flat guess. History: math and
+# code_gen truncated at 40/250 (original caps) -- fixed by adding explicit
+# "do not think out loud" language + temperature=0.0, verified clean across
+# multiple full runs afterward. The largest caps below (500/600) were a
+# blunt safety response to that bug and are likely oversized now that the
+# root cause (soft instructions, higher temperature) is actually fixed --
+# oversized caps mean higher worst-case per-call latency, which is the most
+# likely cause of a later MISSING_TASKS result (real 19-task grading likely
+# ran slower/more contended than our own testing). Values below give
+# 40-70% headroom above the highest completion token count actually
+# observed in a clean, correct run -- real margin, not maximum paranoia.
+#   factual: highest clean observed = 192 -> cap 260
+#   math:    highest clean observed =  65 -> cap 120
+#   logic:   highest clean observed =  57 -> cap 100
+#   code_debug: highest clean observed = 257 -> cap 350
+#   code_gen:   highest clean observed = 246 -> cap 400
+# If you see a [WARN] cap-hit again after this change, that's real signal
+# to raise the specific category back up -- don't blanket-raise all of them.
 MAX_TOKENS_BY_CATEGORY = {
-    "factual": 220,
-    "math": 200,
-    "logic": 150,
-    "code_debug": 500,
-    "code_gen": 600,
+    "factual": 260,
+    "math": 120,
+    "logic": 100,
+    "code_debug": 350,
+    "code_gen": 400,
 }
 DEFAULT_MAX_TOKENS = 200
 

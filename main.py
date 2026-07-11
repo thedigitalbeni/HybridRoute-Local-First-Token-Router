@@ -38,11 +38,14 @@ def main():
         save_results(OUTPUT_PATH, [])
         sys.exit(1)
 
+    print(f"[INFO] loaded {len(tasks)} tasks from {INPUT_PATH}", file=sys.stderr)
+
     local_model = None
     remote_model = None
     results = []
 
-    for task in tasks:
+    for i, task in enumerate(tasks):
+        task_start = time.time()
         task_id = task.get("task_id", "unknown")
         prompt = task.get("prompt", "")
         category = classify_task(prompt)
@@ -76,8 +79,21 @@ def main():
 
         results.append({"task_id": task_id, "answer": answer})
 
-        if time.time() - start > TIME_BUDGET_SECONDS:
-            print("[WARN] approaching time budget, writing partial results", file=sys.stderr)
+        elapsed_total = time.time() - start
+        elapsed_task = time.time() - task_start
+        print(
+            f"[TIMING] task {i + 1}/{len(tasks)} ({task_id}, {category}, {route}) "
+            f"took {elapsed_task:.1f}s, {elapsed_total:.1f}s elapsed total",
+            file=sys.stderr,
+        )
+
+        if elapsed_total > TIME_BUDGET_SECONDS:
+            skipped = [t.get("task_id", "unknown") for t in tasks[i + 1 :]]
+            print(
+                f"[WARN] time budget hit after {i + 1}/{len(tasks)} tasks -- "
+                f"skipping {len(skipped)} remaining task(s): {skipped}",
+                file=sys.stderr,
+            )
             break
 
     save_results(OUTPUT_PATH, results)
