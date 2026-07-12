@@ -1,0 +1,34 @@
+[
+  {
+    "task_id": "practice-01",
+    "answer": "The capital of Australia is **Canberra**, and it is situated along **Lake Burley Griffin**, an artificial lake in the heart of the city. Canberra was purpose-built as the capital in 1908 as a compromise between rivals Sydney and Melbourne, and the lake was later constructed in the 1960s as a central feature of the city's design."
+  },
+  {
+    "task_id": "practice-02",
+    "answer": "# Solving Step by Step\n\n**Starting amount:** 240 items\n\n**Monday sales (15% of 240):**\n$$0.15 \\times 240 = 36 \\text{ items}$$\n\n**Tuesday sales:** 60 items\n\n**Total items sold:**\n$$36 + 60 = 96 \\text{ items}$$\n\n**Items remaining:**\n$$240 - 96 = 144 \\text{ items}$$\n\n**Answer: 144 items**"
+  },
+  {
+    "task_id": "practice-03",
+    "answer": "**Mixed.** The review praises the battery life as \"great\" (positive) but criticizes the screen for scratching too easily (negative), resulting in a balanced mix of both sentiments."
+  },
+  {
+    "task_id": "practice-04",
+    "answer": "It looks like you haven't included the text you'd like summarized\u2014please paste the paragraph you'd like me to condense into a single sentence."
+  },
+  {
+    "task_id": "practice-05",
+    "answer": "Maria Sanchez (PERSON)\nFireworks AI (ORG)\nBerlin (LOCATION)\nlast March (DATE)"
+  },
+  {
+    "task_id": "practice-06",
+    "answer": "def get_max(nums):\n    return max(nums)"
+  },
+  {
+    "task_id": "practice-07",
+    "answer": "**Constraints:**\n1. Three friends: Sam, Jo, Lee\n2. Three pets: cat, dog, bird (each friend owns a different one)\n3. Sam does not own the bird\n4. Jo owns the dog\n\n**Step-by-step reasoning:**\n- Jo owns the dog \u2192 Jo = dog\n- The remaining pets (cat, bird) belong to Sam and Lee\n- Sam cannot own the bird \u2192 Sam must own the cat\n- Therefore, Lee owns the bird\n\n**Answer: Sam owns the cat.**"
+  },
+  {
+    "task_id": "practice-08",
+    "answer": "def second_largest(numbers):\n    unique = set(numbers)\n    if len(unique) < 2:\n        raise ValueError(\"List must contain at least two distinct numbers\")\n    return sorted(unique)[-2]"
+  }
+]

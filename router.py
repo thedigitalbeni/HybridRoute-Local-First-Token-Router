@@ -9,25 +9,14 @@ CATEGORY_CODE_DEBUG = "code_debug"
 CATEGORY_LOGIC = "logic"
 CATEGORY_CODE_GEN = "code_gen"
 
-# --- Routing strategy ---
-# LOCAL  = zero Fireworks tokens, answered by the small quantized model in the image.
-# REMOTE = sent through FIREWORKS_BASE_URL, costs tokens, used where a 1.5-3B model
-#          is likely to be unreliable enough to risk the 80% accuracy gate.
-#
-# UPDATED after real local-model testing on 2025-07-10: factual knowledge
-# moved to remote after the local 3B model confidently hallucinated on a real
-# practice task (confused "Australian Capital Territory," a political region,
-# for a body of water, when asked what water body Canberra is near). Sentiment
-# and NER both tested correct and stay local. Summarization is untested (the
-# published practice prompt was a broken placeholder) -- if you get a chance,
-# test it with a real paragraph before fully trusting it either.
-#
-# TUNE THIS further if you get more test signal. If in doubt, remote is the
-# safer default: losing some token efficiency beats failing the 80% gate.
+# --- ACCURACY-FIRST STRATEGY ---
+# Route EVERYTHING to remote. We don't care about tokens right now.
+# The ONLY goal is to clear the 80% accuracy gate (16/19).
+# Once we're on the scoreboard, we can optimize tokens later.
 ROUTE_MAP = {
-    CATEGORY_SENTIMENT: "local",
-    CATEGORY_SUMMARY: "local",
-    CATEGORY_NER: "local",
+    CATEGORY_SENTIMENT: "remote",
+    CATEGORY_SUMMARY: "remote",
+    CATEGORY_NER: "remote",
     CATEGORY_FACTUAL: "remote",
     CATEGORY_MATH: "remote",
     CATEGORY_LOGIC: "remote",
@@ -63,12 +52,6 @@ def classify_task(prompt: str) -> str:
         return CATEGORY_SUMMARY
 
     # Logical / deductive reasoning: constraint puzzle language.
-    # Broadened after real testing showed the narrow version (tied to the
-    # single "who owns a pet" practice example's exact phrasing) completely
-    # missed other valid puzzle styles: "each work in a different department"
-    # (different verb than has/owns/likes), "who finished/works/lives" (not
-    # just "who owns"), and positional/spatial grid puzzles ("immediately
-    # left of", "in the middle") that don't use "each...different" at all.
     if re.search(
         r"\beach\b.*\bdifferent\b"
         r"|\bwho (is|was|owns|works|worked|finished|lives|lived|plays|played|has)\b"

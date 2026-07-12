@@ -1,0 +1,78 @@
+[
+  {
+    "task_id": "scale-01",
+    "answer": "The capital of Canada is Ottawa, and the river that runs through it is the Ottawa River."
+  },
+  {
+    "task_id": "scale-02",
+    "answer": "Albert Einstein wrote the theory of relativity, and the general theory was published in 1915."
+  },
+  {
+    "task_id": "scale-03",
+    "answer": "The tallest mountain in Africa is Mount Kilimanjaro, located in Tanzania."
+  },
+  {
+    "task_id": "scale-04",
+    "answer": "400"
+  },
+  {
+    "task_id": "scale-05",
+    "answer": "52.5 mph"
+  },
+  {
+    "task_id": "scale-06",
+    "answer": "Mixed, as the review highlights both positive (intuitive interface, fast) and negative (customer support delay) aspects."
+  },
+  {
+    "task_id": "scale-07",
+    "answer": "The sentiment of the review is positive as it expresses love for the food and great service."
+  },
+  {
+    "task_id": "scale-08",
+    "answer": "Solar panels convert sunlight into electricity via photovoltaic cells made of semiconductor materials, generating an electric current when excited by sunlight; modern residential systems can substantially reduce household electricity usage, though efficiency depends on panel orientation, shading, and climate."
+  },
+  {
+    "task_id": "scale-09",
+    "answer": "Coral reefs, essential to a quarter of marine species despite covering a small fraction of the ocean floor, are severely threatened by climate change-induced bleaching, posing risks to coastal communities that rely on them for fishing and tourism."
+  },
+  {
+    "task_id": "scale-10",
+    "answer": "Dr. Amara Okafor (PERSON)\nStanford University (ORG)\nCalifornia (LOCATION)\nNovember (DATE)"
+  },
+  {
+    "task_id": "scale-11",
+    "answer": "Toronto (LOCATION)\nNetflix (ORG)\nTed Sarandos (PERSON)\nTuesday (DATE)"
+  },
+  {
+    "task_id": "scale-12",
+    "answer": "def get_average(nums): return sum(nums) / len(nums) - 0.5"
+  },
+  {
+    "task_id": "scale-13",
+    "answer": "def is_palindrome(s): return s == s[::-1].lower()"
+  },
+  {
+    "task_id": "scale-14",
+    "answer": "Leo works in IT."
+  },
+  {
+    "task_id": "scale-15",
+    "answer": "Yellow"
+  },
+  {
+    "task_id": "scale-16",
+    "answer": "Alex"
+  },
+  {
+    "task_id": "scale-17",
+    "answer": "def count_vowels(s):\n    return sum(1 for c in s if c.lower() in 'aeiou')"
+  },
+  {
+    "task_id": "scale-18",
+    "answer": "def is_prime(n):\n    if n <= 1:\n        return False\n    for i in range(2, int(n**0.5) + 1):\n        if n % i == 0:\n            return False\n    return True"
+  },
+  {
+    "task_id": "scale-19",
+    "answer": "def flatten(nested_list):\n    flat_list = []\n    for item in nested_list:\n        if isinstance(item, list):\n            flat_list.extend(flatten(item))\n        else:\n            flat_list.append(item)\n    return flat_list"
+  }
+]

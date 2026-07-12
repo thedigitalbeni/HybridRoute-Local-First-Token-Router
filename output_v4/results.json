@@ -1,0 +1,78 @@
+[
+  {
+    "task_id": "scale-01",
+    "answer": "The capital of Canada is Ottawa, and the river that runs through it is the Ottawa River."
+  },
+  {
+    "task_id": "scale-02",
+    "answer": "Albert Einstein wrote the theory of relativity, and the general theory was published in 1915."
+  },
+  {
+    "task_id": "scale-03",
+    "answer": "The tallest mountain in Africa is Mount Kilimanjaro, located in Tanzania."
+  },
+  {
+    "task_id": "scale-04",
+    "answer": "450"
+  },
+  {
+    "task_id": "scale-05",
+    "answer": "To find the average speed over the two hours, we need to follow these steps:\n\n1. Calculate the total distance traveled.\n2. Calculate the total time taken.\n3. Use the formula for average speed: \\(\\text{Average Speed} = \\frac{\\text{Total Distance}}{\\text{Total Time}}\\).\n\nStep 1: Calculate the total distance traveled.\n- Distance in the first hour: 60 miles\n- Distance in the second hour: 45 miles\n- Total distance = 60 miles + 45 miles = 105 miles\n\nStep 2: Calculate the total time taken.\n- Time in the first hour: 1 hour\n- Time in the second hour: 1 hour\n- Total time = 1 hour + 1 hour = 2 hours\n\nStep 3: Calculate the average speed.\n- Average speed = \\(\\frac{\\text{Total Distance}}{\\text{Total Time}} = \\frac{"
+  },
+  {
+    "task_id": "scale-06",
+    "answer": "Mixed, as the review highlights both positive (intuitive interface, fast) and negative (customer support delay) aspects."
+  },
+  {
+    "task_id": "scale-07",
+    "answer": "The sentiment of the review is positive as it expresses love for the food and great service."
+  },
+  {
+    "task_id": "scale-08",
+    "answer": "Solar panels convert sunlight into electricity via photovoltaic cells made of semiconductor materials, generating an electric current when excited by sunlight; modern residential systems can substantially reduce household electricity usage, though efficiency depends on panel orientation, shading, and climate."
+  },
+  {
+    "task_id": "scale-09",
+    "answer": "Coral reefs, essential to a quarter of marine species despite covering a small fraction of the ocean floor, are severely threatened by climate change-induced bleaching, posing risks to coastal communities that rely on them for fishing and tourism."
+  },
+  {
+    "task_id": "scale-10",
+    "answer": "Dr. Amara Okafor (PERSON)\nStanford University (ORG)\nCalifornia (LOCATION)\nNovember (DATE)"
+  },
+  {
+    "task_id": "scale-11",
+    "answer": "Toronto (LOCATION)\nNetflix (ORG)\nTed Sarandos (PERSON)\nTuesday (DATE)"
+  },
+  {
+    "task_id": "scale-12",
+    "answer": "Bug: division by len(nums) - 1 instead of len(nums).\nCorrected function: def get_average(nums): return sum(nums) / len(nums)"
+  },
+  {
+    "task_id": "scale-13",
+    "answer": "Bug: The function does not handle spaces and punctuation correctly.\ncorrected def is_palindrome(s): return s.replace(' ', '').replace('_', '').replace('-', '').replace('.', '').replace(',', '').lower() == s[::-1].lower()"
+  },
+  {
+    "task_id": "scale-14",
+    "answer": "Leo"
+  },
+  {
+    "task_id": "scale-15",
+    "answer": "yellow"
+  },
+  {
+    "task_id": "scale-16",
+    "answer": "Let's list the constraints from the problem step by step:\n\n1. Alex, Beth, and Cara finished in different positions: first, second, third.\n2. Alex did not finish first.\n3. Beth finished before Cara.\n\nFrom constraint 1, we know the possible positions are:\n- First\n- Second\n- Third\n\nFrom constraint 2, Alex cannot be first. Therefore, Alex must be either second or third.\n\nFrom constraint 3, Beth finished before Cara. This means if Beth is in a position, Cara must be in a later position.\n\nLet's analyze the possible scenarios:\n\n- If Alex is second:\n  - Beth must be first (since Alex cannot be first and Beth must be before Cara).\n  - Cara must be third.\n  - This scenario satisfies all constraints: Alex is second, Beth is first, Cara is third, and Beth is before Cara.\n\n- If Alex is third:\n  - Beth must be first (since Alex cannot be first and Beth must be before Cara).\n  - Cara must be second.\n  - This scenario also satisfies all constraints: Alex is third, Beth is first, Cara is second, and Beth is before Cara.\n\nGiven the constraints, both scenarios are valid. However, we"
+  },
+  {
+    "task_id": "scale-17",
+    "answer": "def count_vowels(s):\n    return sum(1 for c in s if c.lower() in 'aeiou')"
+  },
+  {
+    "task_id": "scale-18",
+    "answer": "def is_prime(n):\n    if n <= 1:\n        return False\n    for i in range(2, int(n**0.5) + 1):\n        if n % i == 0:\n            return False\n    return True"
+  },
+  {
+    "task_id": "scale-19",
+    "answer": "def flatten(nested_list):\n    flat_list = []\n    for item in nested_list:\n        if isinstance(item, list):\n            flat_list.extend(flatten(item))\n        else:\n            flat_list.append(item)\n    return flat_list"
+  }
+]

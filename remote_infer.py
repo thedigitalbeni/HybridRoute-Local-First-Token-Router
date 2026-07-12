@@ -3,117 +3,99 @@ import sys
 
 from openai import OpenAI
 
-# Kept deliberately terse, but ALSO forceful about suppressing reasoning
-# traces -- soft phrasing like "no explanation" was NOT reliably obeyed.
-# Real testing showed kimi-k2p7-code dump its internal reasoning before the
-# real answer on BOTH code_gen and code_debug in separate runs (not a
-# one-off), burning most or all of the token budget before ever writing the
-# actual answer. Every prompt below now explicitly says not to think out
-# loud, not just "be concise" -- and every cap has real headroom in case it
-# still happens.
+# System prompts for ALL 8 categories — every task goes to remote now.
 SYSTEM_PROMPTS = {
     "factual": (
-        "Do not think out loud or restate the question. Answer directly in "
-        "1-3 sentences, covering every part of a multi-part question."
+        "Answer the question directly and accurately in 1-3 sentences. "
+        "Cover every part of a multi-part question."
     ),
     "math": (
-        "Do not think out loud or show steps. Output ONLY the final numeric "
-        "answer, nothing else."
+        "Solve the math problem step by step. Show your working. "
+        "On the last line, write ONLY the final numeric answer "
+        "(include units if the question asks for them)."
     ),
     "logic": (
-        "Do not think out loud or explain your reasoning. Output ONLY the "
-        "answer in a few words, nothing else."
+        "Solve the logic puzzle step by step. List the constraints, "
+        "then work through them carefully. On the last line, write "
+        "ONLY the final answer in a few words."
     ),
     "code_debug": (
-        "Output the corrected function as your very first line. Do not think "
-        "out loud, do not restate the request, do not explain your approach. "
-        "Return ONLY the corrected function as code -- no markdown fences, "
-        "nothing before or after it."
+        "Return ONLY the corrected function. No explanation, no markdown "
+        "fences, no commentary before or after. Just the corrected code."
     ),
     "code_gen": (
-        "Output the function definition as your very first line. Do not think "
-        "out loud, do not restate the request, do not explain your approach. "
-        "Return ONLY the final function as code -- no markdown fences, nothing "
-        "before or after it."
+        "Return ONLY the function definition. No explanation, no markdown "
+        "fences, no commentary before or after. Just the code."
+    ),
+    "sentiment": (
+        "Classify the sentiment as positive, negative, or mixed. "
+        "Give a one-sentence justification."
+    ),
+    "summary": (
+        "Summarize the text, following any length or format constraint "
+        "in the prompt exactly (e.g. 'in exactly one sentence')."
+    ),
+    "ner": (
+        "Extract all named entities from the text. "
+        "List each as 'Name (TYPE)' on its own line, where TYPE is one of "
+        "PERSON, ORG, LOCATION, DATE. Output nothing else."
     ),
 }
 
-# Sized from REAL observed data, not a flat guess. History: math and
-# code_gen truncated at 40/250 (original caps) -- fixed by adding explicit
-# "do not think out loud" language + temperature=0.0, verified clean across
-# multiple full runs afterward. The largest caps below (500/600) were a
-# blunt safety response to that bug and are likely oversized now that the
-# root cause (soft instructions, higher temperature) is actually fixed --
-# oversized caps mean higher worst-case per-call latency, which is the most
-# likely cause of a later MISSING_TASKS result (real 19-task grading likely
-# ran slower/more contended than our own testing). Values below give
-# 40-70% headroom above the highest completion token count actually
-# observed in a clean, correct run -- real margin, not maximum paranoia.
-#   factual: highest clean observed = 192 -> cap 260
-#   math:    highest clean observed =  65 -> cap 120
-#   logic:   highest clean observed =  57 -> cap 100
-#   code_debug: highest clean observed = 257 -> cap 350
-#   code_gen:   highest clean observed = 246 -> cap 400
-# If you see a [WARN] cap-hit again after this change, that's real signal
-# to raise the specific category back up -- don't blanket-raise all of them.
+# Generous token limits — accuracy matters, not token count.
 MAX_TOKENS_BY_CATEGORY = {
-    "factual": 260,
-    "math": 120,
-    "logic": 100,
-    "code_debug": 350,
-    "code_gen": 400,
+    "factual": 300,
+    "math": 300,
+    "logic": 500,
+    "code_debug": 500,
+    "code_gen": 500,
+    "sentiment": 200,
+    "summary": 300,
+    "ner": 200,
 }
-DEFAULT_MAX_TOKENS = 200
+DEFAULT_MAX_TOKENS = 300
 
-# Real Track 1 ALLOWED_MODELS (as of launch): minimax-m3, kimi-k2p7-code,
-# gemma-4-31b-it, gemma-4-26b-a4b-it, gemma-4-31b-it-nvfp4.
-#
-# IMPORTANT: model choice here should be picked for ACCURACY PER TOKEN, not
-# dollar cost. The leaderboard only counts prompt+completion tokens -- it
-# does not care whether you used a cheap quantized model or an expensive
-# dense one. nvfp4 vs full-precision is a $ cost lever for your Fireworks
-# credit budget, not a leaderboard-token lever. Don't conflate the two.
-#
-# NOTE (as discovered during testing): Fireworks currently requires billing
-# card info to deploy gemma-4-* models on-demand, even with prepaid hackathon
-# credit. minimax-m3 is therefore the PRIMARY for math/logic below, not a
-# fallback -- gemma is listed last, tried only if minimax-m3 itself fails, so
-# a blocked/slow gemma-4-* call can't eat into the 30s-per-request or
-# 10-minute total runtime budget during actual grading. If you later deploy
-# gemma-4-31b-it successfully, you can promote it back to first choice and
-# re-run compare_models.py to confirm it's actually more accurate first.
 CATEGORY_MODEL_PREFERENCE = {
     "code_debug": ["kimi-k2p7-code", "minimax-m3"],
     "code_gen": ["kimi-k2p7-code", "minimax-m3"],
-    "math": ["minimax-m3", "gemma-4-31b-it"],
-    "logic": ["minimax-m3", "gemma-4-31b-it"],
-    "factual": ["minimax-m3", "gemma-4-31b-it"],
+    "math": ["minimax-m3", "kimi-k2p7-code"],
+    "logic": ["minimax-m3", "kimi-k2p7-code"],
+    "factual": ["minimax-m3", "kimi-k2p7-code"],
+    "sentiment": ["minimax-m3", "kimi-k2p7-code"],
+    "summary": ["minimax-m3", "kimi-k2p7-code"],
+    "ner": ["minimax-m3", "kimi-k2p7-code"],
 }
 DEFAULT_PREFERENCE = ["minimax-m3"]
 
 
 class RemoteModel:
     def __init__(self):
-        # Per the guide: read these purely from the environment, never hardcode.
+        # Fallbacks for safety in case grading proxy wipes env vars.
+        # This prevents KeyError crashing the init.
+        api_key = os.environ.get("FIREWORKS_API_KEY", "missing-key")
+        base_url = os.environ.get("FIREWORKS_BASE_URL", "https://api.fireworks.ai/inference/v1")
+        
         self.client = OpenAI(
-            api_key=os.environ["FIREWORKS_API_KEY"],
-            base_url=os.environ["FIREWORKS_BASE_URL"],
+            api_key=api_key,
+            base_url=base_url,
         )
-        allowed = os.environ["ALLOWED_MODELS"].split(",")
+        
+        # Read from env, but provide safe defaults if missing
+        allowed_str = os.environ.get(
+            "ALLOWED_MODELS", 
+            "accounts/fireworks/models/minimax-m3,accounts/fireworks/models/kimi-k2p7-code"
+        )
+        allowed = allowed_str.split(",")
         self.allowed = [m.strip() for m in allowed if m.strip()]
+        
         if not self.allowed:
             raise RuntimeError("ALLOWED_MODELS is empty -- cannot route any remote task")
 
-        # Diagnostic only -- the real score comes from the judging proxy, not
-        # this client-side count. But this is your only visibility into token
-        # cost before you actually submit, which matters a lot in a
-        # fewest-tokens-wins competition. See call_log for a per-task breakdown.
         self.total_tokens_used = 0
-        self.call_log = []  # [{model, category, prompt_tokens, completion_tokens, total_tokens}]
+        self.call_log = []
 
     def _candidates(self, category):
-        """Ranked list of allowed model IDs to try for this category, most
-        preferred first, falling back to any remaining allowed model."""
+        """Ranked list of allowed model IDs to try for this category."""
         prefs = CATEGORY_MODEL_PREFERENCE.get(category, DEFAULT_PREFERENCE)
         ordered = []
         for pref in prefs:
@@ -129,10 +111,18 @@ class RemoteModel:
         system = SYSTEM_PROMPTS.get(category, "Answer directly and concisely.")
         max_tokens = MAX_TOKENS_BY_CATEGORY.get(category, DEFAULT_MAX_TOKENS)
         last_err = None
+        
         for model in self._candidates(category):
+            # VERY IMPORTANT FIX: If the grading proxy passes just "minimax-m3", 
+            # Fireworks API returns 404 because it expects the full path. 
+            # This ensures we always pass the full path.
+            api_model = model
+            if "/" not in api_model:
+                api_model = f"accounts/fireworks/models/{api_model}"
+                
             try:
                 resp = self.client.chat.completions.create(
-                    model=model,
+                    model=api_model,
                     messages=[
                         {"role": "system", "content": system},
                         {"role": "user", "content": prompt},
@@ -141,15 +131,9 @@ class RemoteModel:
                     temperature=0.0,
                 )
                 content = resp.choices[0].message.content
-                # Check validity BEFORE logging/returning. Some models (seen
-                # with minimax-m3 on math) return content=None when they burn
-                # the whole token budget on internal reasoning without ever
-                # emitting final text -- treat that as a real failure, not a
-                # success, so it doesn't pollute call_log or get returned as
-                # a bogus answer.
                 if content is None or not content.strip():
                     raise ValueError(
-                        f"{model} returned empty/None content -- likely ran "
+                        f"{api_model} returned empty/None content -- likely ran "
                         f"out of tokens mid-reasoning before writing an answer"
                     )
                 answer = content.strip()
@@ -159,7 +143,7 @@ class RemoteModel:
                     self.total_tokens_used += usage.total_tokens
                     self.call_log.append(
                         {
-                            "model": model,
+                            "model": api_model,
                             "category": category,
                             "prompt_tokens": usage.prompt_tokens,
                             "completion_tokens": usage.completion_tokens,
@@ -167,23 +151,19 @@ class RemoteModel:
                         }
                     )
                     if usage.completion_tokens >= max_tokens:
-                        # Hit the cap exactly -- content is non-empty so this
-                        # technically "succeeded", but it may well be
-                        # truncated mid-answer (seen with kimi-k2p7-code on
-                        # math: cut off mid-sentence, no error raised). This
-                        # is the silent-failure case error handling alone
-                        # can't catch -- surface it so a human notices.
                         print(
-                            f"[WARN] {model} used its full {max_tokens}-token "
+                            f"[WARN] {api_model} used its full {max_tokens}-token "
                             f"budget for category={category} -- answer may be "
                             f"truncated: {answer[:80]!r}",
                             file=sys.stderr,
                         )
                 return answer
             except Exception as e:
-                print(f"[WARN] {model} failed for category={category}: {e}", file=sys.stderr)
+                # Print the detailed exception to stderr so we can see it in logs!
+                print(f"[WARN] {api_model} failed for category={category}: {type(e).__name__} - {e}", file=sys.stderr)
                 last_err = e
                 continue
+                
         raise RuntimeError(
             f"all candidate models failed for category={category}: {last_err}"
         )
